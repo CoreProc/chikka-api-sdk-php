@@ -97,7 +97,7 @@ class Sms
      */
     public function setMessage($message)
     {
-        $this->message = $message;
+        $this->message = trim($message);
     }
 
 
@@ -111,17 +111,20 @@ class Sms
         $this->validate($params);
 
         try {
-            $response = $this->chikkaClient->client->post($this->chikkaRequestUrl, [
-                'form_params' => [
-                    'message_type'  => $this->messageType,
-                    'mobile_number' => $params['mobile_number'],
-                    'message_id'    => $params['message_id'],
-                    'message'       => $params['message'],
-                    'shortcode'     => $this->chikkaClient->getShortCode(),
-                    'client_id'     => $this->chikkaClient->getClientId(),
-                    'secret_key'    => $this->chikkaClient->getSecretKey()
+            $response = $this->chikkaClient->client->post($this->chikkaRequestUrl,
+                [
+                    'body' =>
+                        [
+                            'message_type'  => $this->messageType,
+                            'mobile_number' => $params['mobile_number'],
+                            'message_id'    => $params['message_id'],
+                            'message'       => $params['message'],
+                            'shortcode'     => $this->chikkaClient->getShortCode(),
+                            'client_id'     => $this->chikkaClient->getClientId(),
+                            'secret_key'    => $this->chikkaClient->getSecretKey()
+                        ]
                 ]
-            ]);
+            );
 
             $json = $response->json();
 
@@ -139,11 +142,13 @@ class Sms
     {
         $validator = new Validator($params);
 
-        $validator->rules('required', [
-            'message',
-            'mobile_number',
-            'shortcode'
-        ]);
+        $validator->rules('required',
+            [
+                'message',
+                'mobile_number',
+                'shortcode'
+            ],
+            '');
 
         if ( ! $validator->validate()) {
             $errors = '';
