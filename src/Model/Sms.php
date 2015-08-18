@@ -131,7 +131,7 @@ class Sms
             return $json;
 
         } catch (BadResponseException $e) {
-            throw new \Exception($e->getMessage());
+            return $e->getResponse()->json();
         }
 
         return null;
@@ -147,8 +147,7 @@ class Sms
                 'message',
                 'mobile_number',
                 'shortcode'
-            ],
-            '');
+            ]);
 
         if ( ! $validator->validate()) {
             $errors = '';
