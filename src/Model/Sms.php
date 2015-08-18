@@ -3,6 +3,7 @@
 namespace Coreproc\Chikka\Model;
 
 use Coreproc\Chikka\ChikkaClient;
+use Exception;
 use GuzzleHttp\Exception\BadResponseException;
 use Valitron\Validator;
 
@@ -102,27 +103,55 @@ class Sms
 
 
     /**
-     * @param array $params
-     * @throws \Exception
+     * @param string|null $messageId Unique ID (for at least 24 hours) you need to
+     * generate. This will be used in tracking your Delivery Notifications. Max
+     * length: 32 characters
+     * @param string|null $mobileNumber Mobile number of the user whom you want to
+     * send the message to.
+     * @param string|null $message Contents of the message to be sent to the user.
+     * Max length: 420 characters
+     * @return array;
+     * @throws Exception
      */
-    public function send(array $params)
+    public function send($messageId = null, $mobileNumber = null, $message = null)
     {
+        if ( ! empty($messageId)) {
+            $this->setMessageId($messageId);
+        }
+        if ( ! empty($mobileNumber)) {
+            $this->setMobileNumber($mobileNumber);
+        }
+        if ( ! empty($message)) {
+            $this->setMessage($message);
+        }
 
-        $this->validate($params);
+        $params = [
+            'message_id'    => $this->getMessageId(),
+            'mobile_number' => $this->getMobileNumber(),
+            'message'       => $this->getMessage(),
+            'shortcode'     => $this->chikkaClient->getShortCode(),
+            'client_id'     => $this->chikkaClient->getClientId(),
+            'secret_key'    => $this->chikkaClient->getSecretKey(),
+            'message_type'  => 'SEND'
+        ];
 
         try {
-            $response = $this->chikkaClient->client->post($this->chikkaRequestUrl,
-                [
-                    'body' =>
-                        [
-                            'message_type'  => $this->messageType,
-                            'mobile_number' => $params['mobile_number'],
-                            'message_id'    => $params['message_id'],
-                            'message'       => $params['message'],
-                            'shortcode'     => $this->chikkaClient->getShortCode(),
-                            'client_id'     => $this->chikkaClient->getClientId(),
-                            'secret_key'    => $this->chikkaClient->getSecretKey()
-                        ]
+            $this->validate($params);
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        try {
+            $response = $this->chikkaClient->client->post($this->chikkaRequestUrl, [
+                    'body' => [
+                        'message_type'  => $this->messageType,
+                        'mobile_number' => $params['mobile_number'],
+                        'message_id'    => $params['message_id'],
+                        'message'       => $params['message'],
+                        'shortcode'     => $this->chikkaClient->getShortCode(),
+                        'client_id'     => $this->chikkaClient->getClientId(),
+                        'secret_key'    => $this->chikkaClient->getSecretKey()
+                    ]
                 ]
             );
 
@@ -131,10 +160,8 @@ class Sms
             return $json;
 
         } catch (BadResponseException $e) {
-            return $e->getResponse()->json();
+            throw $e;
         }
-
-        return null;
     }
 
 
@@ -142,18 +169,20 @@ class Sms
     {
         $validator = new Validator($params);
 
-        $validator->rules('required',
-            [
-                'message',
-                'mobile_number',
-                'shortcode'
-            ]);
+        $validator->rule('required', [
+            'message',
+            'mobile_number',
+            'shortcode',
+            'client_id',
+            'secret_key',
+            'message_type'
+        ]);
 
         if ( ! $validator->validate()) {
             $errors = '';
 
             foreach ($validator->errors() as $key => $value) {
-                $errors .= $key . 'is required .';
+                $errors .= $key . ' is required. ';
             }
 
             throw new \Exception($errors);

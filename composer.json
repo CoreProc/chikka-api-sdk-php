@@ -7,11 +7,11 @@
             "email": "coreproc@coreproc.ph"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
-		"guzzlehttp/guzzle": "~5.0",
-        "vlucas/valitron": "~1.2"
-	},
+        "guzzlehttp/guzzle": "~5.0",
+        "vlucas/valitron": "~1.2",
+        "symfony/var-dumper": "^3.0@dev"
+    },
     "autoload": {
         "psr-4": {
             "Coreproc\\Chikka\\": "src"
