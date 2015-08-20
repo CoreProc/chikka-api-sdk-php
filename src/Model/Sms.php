@@ -38,11 +38,6 @@ class Sms
      */
     private $chikkaRequestUrl = "https://post.chikka.com/smsapi/request";
 
-    /**
-     * @var string
-     */
-    private $messageType = "SEND";
-
 
     /**
      * @param ChikkaClient $chikkaClient
@@ -144,7 +139,7 @@ class Sms
         try {
             $response = $this->chikkaClient->client->post($this->chikkaRequestUrl, [
                     'body' => [
-                        'message_type'  => $this->messageType,
+                        'message_type'  => $params['message_type'],
                         'mobile_number' => $params['mobile_number'],
                         'message_id'    => $params['message_id'],
                         'message'       => $params['message'],
