@@ -10,7 +10,8 @@
     "require": {
         "guzzlehttp/guzzle": "~5.0",
         "vlucas/valitron": "~1.2",
-        "symfony/var-dumper": "^3.0@dev"
+        "symfony/var-dumper": "^3.0@dev",
+        "nesbot/carbon": "~1.14"
     },
     "autoload": {
         "psr-4": {

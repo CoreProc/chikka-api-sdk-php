@@ -155,7 +155,10 @@ class Sms
             return $json;
 
         } catch (BadResponseException $e) {
-            throw $e;
+
+            $exception = new Exception(json_decode(json_encode($e->getResponse()->json()))->description, $e->getCode());
+            throw $exception;
+
         }
     }
 
