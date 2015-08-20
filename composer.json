@@ -11,7 +11,8 @@
         "guzzlehttp/guzzle": "~5.0",
         "vlucas/valitron": "~1.2",
         "symfony/var-dumper": "^3.0@dev",
-        "nesbot/carbon": "~1.14"
+        "nesbot/carbon": "~1.14",
+        "coreproc/msisdn-ph": "1.0.*"
     },
     "autoload": {
         "psr-4": {

@@ -3,6 +3,7 @@
 namespace Coreproc\Chikka\Model;
 
 use Coreproc\Chikka\ChikkaClient;
+use Coreproc\MsisdnPh\Msisdn;
 use Exception;
 use GuzzleHttp\Exception\BadResponseException;
 use Valitron\Validator;
@@ -167,6 +168,10 @@ class Sms
     {
         $validator = new Validator($params);
 
+        Validator::addRule('mobileNumber', function ($field, $value, array $params) {
+            return Msisdn::validate($value);
+        }, "Invalid Mobile Number");
+
         $validator->rule('required', [
             'message',
             'mobile_number',
@@ -176,14 +181,10 @@ class Sms
             'message_type'
         ]);
 
+        $validator->rule('mobileNumber', 'mobile_number');
+
         if ( ! $validator->validate()) {
-            $errors = '';
-
-            foreach ($validator->errors() as $key => $value) {
-                $errors .= $key . ' is required. ';
-            }
-
-            throw new \Exception($errors);
+            throw new \Exception($validator->errors());
         }
 
     }
