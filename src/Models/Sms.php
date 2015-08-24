@@ -3,6 +3,7 @@
 namespace Coreproc\Chikka\Models;
 
 use Coreproc\Chikka\Contracts\SmsContract;
+use Coreproc\MsisdnPh\Msisdn;
 
 class Sms implements SmsContract
 {
@@ -16,15 +17,15 @@ class Sms implements SmsContract
     public function __construct($messageId = null, $mobileNumber = null, $message = null)
     {
         if ( ! empty($messageId)) {
-            $this->messageId = $messageId;
+            $this->setMessageId($messageId);
         }
 
         if ( ! empty($mobileNumber)) {
-            $this->mobileNumber = $mobileNumber;
+            $this->setMobileNumber($mobileNumber);
         }
 
         if ( ! empty($message)) {
-            $this->message = $message;
+            $this->setMessage($message);
         }
     }
 
@@ -66,7 +67,15 @@ class Sms implements SmsContract
      */
     public function setMobileNumber($mobileNumber)
     {
+        // We should format the number if it's valid
+        // If it's not a valid mobile number, just let it be and let the API handle it.
+
         $this->mobileNumber = $mobileNumber;
+
+        if (Msisdn::validate($mobileNumber)) {
+            $msisdn = new Msisdn($mobileNumber);
+            $this->mobileNumber = $msisdn->get();
+        }
     }
 
     /**
