@@ -74,7 +74,8 @@ class Sms implements SmsContract
 
         if (Msisdn::validate($mobileNumber)) {
             $msisdn = new Msisdn($mobileNumber);
-            $this->mobileNumber = $msisdn->get();
+            $msisdn->setCountryPrefix('63');
+            $this->mobileNumber = $msisdn->get(true);
         }
     }
 
