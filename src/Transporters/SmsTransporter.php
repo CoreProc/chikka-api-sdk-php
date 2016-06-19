@@ -135,6 +135,16 @@ class SmsTransporter
      */
     public function reply($requestId, $requestCost = 'FREE', SmsTransporterActionsContract $smsTransporterActions = null)
     {
+        // Transform request cost
+        if (is_numeric($requestCost)) {
+            if ($requestCost <= 0) {
+                $requestCost = 'FREE';
+            }
+        }
+        if (is_null($requestCost)) {
+            $requestCost = 'FREE';
+        }
+
         if (empty($smsTransporterActions)) {
             $smsTransporterActions = new SmsTransporterActions($this->chikkaClient, $this->sms);
         }
